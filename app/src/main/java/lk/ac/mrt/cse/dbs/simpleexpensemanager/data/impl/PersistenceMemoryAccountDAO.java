@@ -96,14 +96,24 @@ public class PersistenceMemoryAccountDAO implements AccountDAO {
                 null,
                 null
         );
+        if(cursor.moveToFirst()) {
+            String account_no = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_ACCOUNT_NO));
+            String bank_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_BANK));
+            String account_holder_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_ACCOUNT_HOLDER));
+            double balance = cursor.getDouble(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_BALANCE));
 
-        String account_no = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_ACCOUNT_NO));
-        String bank_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_BANK));
-        String account_holder_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_ACCOUNT_HOLDER));
-        double balance = cursor.getDouble(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_BALANCE));
-
-
-        return new Account(account_no, bank_name, account_holder_name, balance);
+            Account account = new Account(account_no,bank_name,account_holder_name,balance);
+            return account;
+        }
+        cursor.close();
+        return null;
+//        String account_no = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_ACCOUNT_NO));
+//        String bank_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_BANK));
+//        String account_holder_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_ACCOUNT_HOLDER));
+//        double balance = cursor.getDouble(cursor.getColumnIndexOrThrow(DBHelper.AccountTable.COL_BALANCE));
+//
+//
+//        return new Account(account_no, bank_name, account_holder_name, balance);
     }
 
     @Override

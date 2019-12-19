@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 
 public class PersistenceMemoryTransaction implements TransactionDAO {
     DBHelper dbHelper ;
+    DateFormat date_format = new SimpleDateFormat("dd-MM-yyyy");
 
     public PersistenceMemoryTransaction(Context context) {
         dbHelper = new DBHelper(context);
@@ -32,7 +34,7 @@ public class PersistenceMemoryTransaction implements TransactionDAO {
         values.put(DBHelper.TransactionTable.COL_ACCOUNT_NO, accountNo);
         values.put(DBHelper.TransactionTable.COL_AMOUNT, amount);
         values.put(DBHelper.TransactionTable.COL_TYPE, expenseType.toString());
-        values.put(DBHelper.TransactionTable.COL_DATE, String.valueOf(date));
+        values.put(DBHelper.TransactionTable.COL_DATE, date_format.format(date));
         long newRowId = db.insert(DBHelper.TransactionTable.TABLE_NAME, null, values);
 
     }
@@ -59,7 +61,7 @@ public class PersistenceMemoryTransaction implements TransactionDAO {
             String type = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TransactionTable.COL_TYPE));
             Date newdate = null;
             try {
-                newdate = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+                newdate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -75,25 +77,18 @@ public class PersistenceMemoryTransaction implements TransactionDAO {
     public List<Transaction> getPaginatedTransactionLogs(int limit) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.query(
-                DBHelper.AccountTable.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ DBHelper.TransactionTable.TABLE_NAME + " LIMIT 10;", null);
 
         List transactionList = new ArrayList<>();
         while(cursor.moveToNext()) {
             String account_no = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TransactionTable.COL_ACCOUNT_NO));
             double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(DBHelper.TransactionTable.COL_AMOUNT));
             String date = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TransactionTable.COL_DATE));
+            System.out.println(date);
             String type = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TransactionTable.COL_TYPE));
             Date newdate = null;
             try {
-                newdate = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+                newdate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
